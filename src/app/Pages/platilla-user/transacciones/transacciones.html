@@ -1,0 +1,83 @@
+<div class="container py-4">
+  <h1 class="mb-4">Gestión de Transacciones</h1>
+
+  <!-- Botón para abrir modal crear transacción -->
+  <button class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#transaccionModal">
+    ➕ Crear Transacción
+  </button>
+
+  <!-- Cards de transacciones -->
+  <div class="row">
+    <div class="col-md-6 mb-3" *ngFor="let t of transacciones">
+      <div class="card h-100 shadow-sm">
+
+        <div class="card-header" [ngClass]="{
+          'text-success': t.tipo === 'INGRESO',
+          'text-danger-opacity': t.tipo === 'EGRESO'
+        }">
+          <h5 class="card-title">{{ t.tipo }} - ${{ t.monto.toFixed(2) }}</h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text"><strong>Descripción:</strong> {{ t.descripcion || 'Sin descripción' }}</p>
+          <p class="card-text"><strong>Fecha:</strong> {{ t.fechaTransaccion | date:'short' }}</p>
+          <p class="card-text"><strong>Categoría:</strong> {{ t.nombreCategoria }}</p>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+          <button class="btn btn-warning btn-sm" (click)="editarTransaccion(t)">✏️ Editar</button>
+          <button class="btn btn-danger btn-sm" (click)="eliminarTransaccion(t.id)">🗑️ Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para crear/editar transacción -->
+  <div class="modal fade" id="transaccionModal" tabindex="-1" aria-labelledby="transaccionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <form [formGroup]="transaccionForm" (ngSubmit)="guardarTransaccion()" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="transaccionModalLabel">Crear / Editar Transacción</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" #closeBtn></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" formControlName="id">
+
+          <div class="mb-3">
+            <label class="form-label">Monto</label>
+            <input type="number" step="0.01" formControlName="monto" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Tipo</label>
+            <select formControlName="tipo" class="form-select" required>
+              <option value="">Seleccione</option>
+              <option value="INGRESO">Ingreso</option>
+              <option value="EGRESO">Egreso</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <input type="text" formControlName="descripcion" class="form-control">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Fecha</label>
+            <input type="datetime-local" formControlName="fechaTransaccion" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Categoría</label>
+            <select formControlName="categoriaId" class="form-select" required>
+              <option value="">Seleccione una categoría</option>
+              <option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.nombre }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success" [disabled]="transaccionForm.invalid">💾 Guardar</button>
+          <button type="button" class="btn btn-secondary" (click)="resetForm()" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

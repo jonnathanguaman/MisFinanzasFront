@@ -1,0 +1,47 @@
+<div class="container py-4">
+  <h1 class="mb-4">Usuarios</h1>
+
+  <form [formGroup]="usuarioForm" (ngSubmit)="guardarUsuario()" class="mb-4">
+    <div class="mb-3">
+      <label for="nombre" class="form-label">Nombre</label>
+      <input id="nombre" type="text" formControlName="nombre" class="form-control"
+             [class.is-invalid]="nombre.invalid && nombre.touched">
+      <div class="invalid-feedback" *ngIf="nombre.invalid && nombre.touched">
+        Nombre requerido.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="email" class="form-label">Correo electrónico</label>
+      <input id="email" type="email" formControlName="email" class="form-control"
+             [class.is-invalid]="email.invalid && email.touched">
+      <div class="invalid-feedback" *ngIf="email.invalid && email.touched">
+        Correo válido requerido.
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="usuarioForm.invalid">Guardar</button>
+    <button type="button" class="btn btn-secondary" (click)="resetForm()">Cancelar</button>
+  </form>
+
+  <!-- Tabla -->
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Email</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of usuarios">
+        <td>{{ u.nombre }}</td>
+        <td>{{ u.email }}</td>
+        <td>
+          <button class="btn btn-warning btn-sm me-1" (click)="editarUsuario(u)">Editar</button>
+          <button class="btn btn-danger btn-sm" (click)="eliminarUsuario(u.id!)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,67 @@
+<div class="container py-4">
+  <h2 class="mb-4">Gestión de Categorías</h2>
+
+  <!-- Botón para abrir el modal -->
+  <button class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#categoriaModal">
+    ➕ Crear categoría
+  </button>
+
+  <!-- Cards de categorías -->
+  <div class="row">
+    <div class="col-md-4 mb-3" *ngFor="let cat of categorias">
+      <div class="card shadow-sm h-100">
+        <div class="card-header">
+          <h5 class="card-title">{{ cat.nombre }}</h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text">{{ cat.descripcion || 'Sin descripción' }}</p>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+          <button class="btn btn-warning btn-sm" (click)="editarCategoria(cat)">✏️ Editar</button>
+          <button class="btn btn-danger btn-sm" (click)="eliminarCategoria(cat.id!)">🗑️ Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para crear/editar categoría -->
+  <div class="modal fade" id="categoriaModal" tabindex="-1" #modalRef aria-labelledby="categoriaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <form [formGroup]="categoriaForm" (ngSubmit)="guardarCategoria()" class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="categoriaModalLabel">Crear / Editar Categoría</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" #closeBtn></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input
+              type="text"
+              id="nombre"
+              class="form-control"
+              formControlName="nombre"
+              [class.is-invalid]="nombre.invalid && (nombre.dirty || nombre.touched)"
+            />
+            <div class="invalid-feedback" *ngIf="nombre.invalid && (nombre.dirty || nombre.touched)">
+              El nombre es obligatorio.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <input
+              type="text"
+              id="descripcion"
+              class="form-control"
+              formControlName="descripcion"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success" [disabled]="categoriaForm.invalid">💾 Guardar</button>
+          <button type="button" class="btn btn-secondary" (click)="resetForm()" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

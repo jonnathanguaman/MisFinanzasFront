@@ -1,0 +1,16 @@
+<nav class="container py-3 mt-4">
+  <div class="row g-3">
+    <div class="col-md-3">
+      <a routerLink="/finanzas/dashboard" class="btn btn-outline-dark w-100">🏠 Inicio</a>
+    </div>
+    <div class="col-md-3">
+      <a routerLink="/finanzas/transacciones" class="btn btn-outline-warning w-100">💰 Gestionar Transacciones</a>
+    </div>
+    <div class="col-md-3">
+      <a routerLink="/finanzas/categoria" class="btn btn-outline-success w-100">📂 Gestionar Categorías</a>
+    </div>
+    <div class="col-md-3">
+      <a (click)="logout()" class="btn btn-outline-danger w-100">❌ Cerrar sesión</a>
+    </div>
+  </div>
+</nav>
