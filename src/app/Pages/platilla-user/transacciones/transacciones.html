@@ -1,9 +1,9 @@
 <div class="container py-4">
-  <h1 class="mb-4">Gestión de Transacciones</h1>
+  <h4 class="mb-4 text-center">Transacciones</h4>
 
   <!-- Botón para abrir modal crear transacción -->
   <button class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#transaccionModal">
-    ➕ Crear Transacción
+    ➕ Transacción
   </button>
 
   <!-- Cards de transacciones -->
@@ -22,7 +22,7 @@
           <p class="card-text"><strong>Fecha:</strong> {{ t.fechaTransaccion | date:'short' }}</p>
           <p class="card-text"><strong>Categoría:</strong> {{ t.nombreCategoria }}</p>
         </div>
-        <div class="card-footer d-flex justify-content-between">
+        <div class="card-footer d-flex justify-content-center align-items-center gap-2">
           <button class="btn btn-warning btn-sm" (click)="editarTransaccion(t)">✏️ Editar</button>
           <button class="btn btn-danger btn-sm" (click)="eliminarTransaccion(t.id)">🗑️ Eliminar</button>
         </div>

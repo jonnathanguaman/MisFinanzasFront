@@ -1,0 +1,111 @@
+<div class="container py-4">
+  <h4 class="mb-4 text-center">Deudas</h4>
+
+  <div class="d-flex gap-3 mb-4">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transaccionModal">
+      ➕ Deuda
+    </button>
+
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#calendarioModal">
+      📅 Calendario
+    </button>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <div class="card h-100 shadow-sm">
+        <div class="card-header">
+          <h5 class="card-title">Pago de tarjeta</h5>
+        </div>
+        <div class="card-body">
+          <p class="card-text"><strong>Descripción:</strong></p>
+          <p class="card-text"><strong>Fecha venciminto:</strong> </p>
+        </div>
+        <div class="card-footer d-flex justify-content-center align-items-center gap-2">
+          <button class="btn btn-warning btn-sm">✏️ Editar</button>
+          <button class="btn btn-danger btn-sm">🗑️ Eliminar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="transaccionModal" tabindex="-1" aria-labelledby="transaccionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <form class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="transaccionModalLabel">Registrar / Editar deuda</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" #closeBtn></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" formControlName="id">
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" formControlName="nombre" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Monto</label>
+            <input type="number" step="0.01" formControlName="monto" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <input type="text" formControlName="descripcion" class="form-control">
+          </div>
+          
+          <div class="mb-3">
+            <label class="form-label">Tipo</label>
+            <select formControlName="tipo" class="form-select" required>
+              <option value="" disabled>Seleccione</option>
+              <option value="corriente">Corriente</option>
+              <option value="egreso">Diferido</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Meses</label>
+            <input type="number" min="1" formControlName="meses" class="form-control" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Vencimiento</label>
+            <input type="date" formControlName="fechaVencimiento" class="form-control" required>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success" >💾 Guardar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- calendario -->
+  <div class="modal fade" id="calendarioModal" tabindex="-1" aria-labelledby="calendarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="calendarioModalLabel">Calendario</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Aquí puedes poner un calendario como FullCalendar o algo básico -->
+          <input type="date" class="form-control" />
+          <!-- O puedes integrar un componente más completo -->
+          <!-- <app-calendario></app-calendario> -->
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+</div>

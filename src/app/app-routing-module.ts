@@ -7,6 +7,7 @@ import { Dashboard } from './Pages/platilla-user/dashboard/dashboard';
 import { PlatillaUser } from './Pages/platilla-user/platilla-user';
 import { Login } from './Pages/login/login';
 import { Register } from './Pages/register/register';
+import { PagosPendientes } from './Pages/platilla-user/pagos-pendientes/pagos-pendientes';
 const routes: Routes = [
 
   {
@@ -37,6 +38,10 @@ const routes: Routes = [
       {
         path: 'transacciones',
         component:Transacciones
+      },
+      {
+        path: 'pagos-pendientes',
+        component:PagosPendientes
       },
       {
         path: 'dashboard',

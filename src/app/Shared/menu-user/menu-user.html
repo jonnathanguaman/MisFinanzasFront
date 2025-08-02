@@ -1,16 +1,30 @@
-<nav class="container py-3 mt-4">
-  <div class="row g-3">
-    <div class="col-md-3">
-      <a routerLink="/finanzas/dashboard" class="btn btn-outline-dark w-100">🏠 Inicio</a>
-    </div>
-    <div class="col-md-3">
-      <a routerLink="/finanzas/transacciones" class="btn btn-outline-warning w-100">💰 Gestionar Transacciones</a>
-    </div>
-    <div class="col-md-3">
-      <a routerLink="/finanzas/categoria" class="btn btn-outline-success w-100">📂 Gestionar Categorías</a>
-    </div>
-    <div class="col-md-3">
-      <a (click)="logout()" class="btn btn-outline-danger w-100">❌ Cerrar sesión</a>
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm mt-3 rounded">
+  <div class="container">
+    <a class="navbar-brand fw-bold" routerLink="/finanzas/dashboard">💼 Mis Finanzas</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu"
+      aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarMenu">
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-3">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/finanzas/dashboard">🏠 Inicio</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/finanzas/transacciones">💰 Transacciones</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/finanzas/pagos-pendientes">💳 Deudas</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/finanzas/categoria">📂 Categorías</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-danger" (click)="logout()">❌ Cerrar Sesión</a>
+        </li>
+      </ul>
     </div>
   </div>
 </nav>

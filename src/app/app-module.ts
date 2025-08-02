@@ -15,6 +15,7 @@ import { JwtInterceptorService } from './Services/jwt-interceptor-service';
 import { MenuUser } from './Shared/menu-user/menu-user';
 import { Login } from './Pages/login/login';
 import { Register } from './Pages/register/register';
+import { PagosPendientes } from './Pages/platilla-user/pagos-pendientes/pagos-pendientes';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { Register } from './Pages/register/register';
     MenuAdmin,
     PlatillaUser,
     Login,
-    Register
+    Register,
+    PagosPendientes
   ],
   imports: [
     BrowserModule,

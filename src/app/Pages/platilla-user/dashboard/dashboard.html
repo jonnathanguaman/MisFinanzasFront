@@ -1,5 +1,5 @@
 <div class="container py-4 bg-light">
-  <h1 class="mb-4">Dashboard Principal</h1>
+  <h4 class="mb-4 text-center">Dashboard</h4>
 
   <!-- Tarjetas resumen -->
   <div class="row g-4">
@@ -16,9 +16,9 @@
     <div class="col-md-3">
       <div class="card shadow-sm">
         <div class="card-body text-center">
-          <div class="card-icon mb-2">📂</div>
-          <h5 class="card-title">Categorías</h5>
-          <p class="fs-4 fw-bold text-success">{{ totalCategorias }}</p>
+          <div class="card-icon mb-2">📊</div>
+          <h5 class="card-title">Balance Global</h5>
+          <p class="fs-4 fw-bold text-dark">$ {{ balanceGlobal | number: '1.2-2' }}</p>
         </div>
       </div>
     </div>
@@ -36,11 +36,12 @@
     <div class="col-md-3">
       <div class="card shadow-sm">
         <div class="card-body text-center">
-          <div class="card-icon mb-2">📊</div>
-          <h5 class="card-title">Balance Global</h5>
-          <p class="fs-4 fw-bold text-dark">$ {{ balanceGlobal | number: '1.2-2' }}</p>
+          <div class="card-icon mb-2">📂</div>
+          <h5 class="card-title">Categorías</h5>
+          <p class="fs-4 fw-bold text-success">{{ totalCategorias }}</p>
         </div>
       </div>
     </div>
+
   </div>
 </div>
