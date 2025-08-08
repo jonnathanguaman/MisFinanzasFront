@@ -2,7 +2,7 @@
   <h4 class="mb-4 text-center">Deudas</h4>
 
   <div class="d-flex gap-3 mb-4">
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transaccionModal">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transaccionModal" (click)="abrirModal()">
       ➕ Deuda
     </button>
 
@@ -12,17 +12,32 @@
   </div>
 
   <div class="row">
-    <div class="col-md-6 mb-3">
+    <div class="col-md-6 mb-3" *ngFor="let p of pagpsPendientes">
       <div class="card h-100 shadow-sm">
         <div class="card-header">
-          <h5 class="card-title">Pago de tarjeta</h5>
+          <h5 class="card-title">{{p.nombre}}</h5>
         </div>
         <div class="card-body">
-          <p class="card-text"><strong>Descripción:</strong></p>
-          <p class="card-text"><strong>Fecha venciminto:</strong> </p>
+          <p class="card-text"><strong>Monto: </strong>${{p.monto || 'Sin descripción'}}</p>
+          <p class="card-text"><strong>Descripción: </strong>{{p.descripcion || 'Sin descripción'}}</p>
+          <p class="card-text"><strong>Fecha venciminto: </strong>{{ p.fechaVencimiento | date:'dd/MM/yyyy' }}</p>
+          <p class="card-text"><strong>Tipo: </strong>{{ p.tipo}}</p>
+          <!-- Botón para desplegar -->
+          <button class="btn p-0" type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#detalles'+ p.id"
+            *ngIf="p.tipo === 'diferido'">
+            🔽 Ver detalles
+          </button>
+
+          <!-- Contenido colapsable -->
+          <div [id]="'detalles' + p.id" class="collapse mt-2">
+            <p class="card-text"><strong>Meses: </strong>{{ p.meses }}</p>
+            <p class="card-text"><strong>Total por mes: </strong>{{ p.totalPagoPorMes }}</p>
+            <p class="card-text"><strong>Meses pagados: </strong>{{ p.mesesPagados }}</p>
+          </div>
+
         </div>
         <div class="card-footer d-flex justify-content-center align-items-center gap-2">
-          <button class="btn btn-warning btn-sm">✏️ Editar</button>
+          <button class="btn btn-warning btn-sm" (click)="editarDeuda(p)">✏️ Editar</button>
           <button class="btn btn-danger btn-sm">🗑️ Eliminar</button>
         </div>
       </div>
@@ -30,47 +45,47 @@
   </div>
 
 
-  <div class="modal fade" id="transaccionModal" tabindex="-1" aria-labelledby="transaccionModalLabel" aria-hidden="true">
+  <div class="modal fade" id="transaccionModal" #modalEditar tabindex="-1" aria-labelledby="transaccionModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <form class="modal-content">
+      <form class="modal-content" [formGroup]="pagosPendientesForm" (ngSubmit)="crearDueda()">
         <div class="modal-header">
           <h5 class="modal-title" id="transaccionModalLabel">Registrar / Editar deuda</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar" #closeBtn></button>
         </div>
         <div class="modal-body">
-          <input type="hidden" formControlName="id">
+          <input type="hidden" formControlName="id" name="id" id="id">
           <div class="mb-3">
             <label class="form-label">Nombre</label>
-            <input type="text" formControlName="nombre" class="form-control" required>
+            <input type="text" formControlName="nombre" name="nombre" id="nombre" class="form-control" required>
           </div>
 
           <div class="mb-3">
             <label class="form-label">Monto</label>
-            <input type="number" step="0.01" formControlName="monto" class="form-control" required>
+            <input type="number" step="0.01" formControlName="monto" name="monto" id="monto" class="form-control" required>
           </div>
 
           <div class="mb-3">
             <label class="form-label">Descripción</label>
-            <input type="text" formControlName="descripcion" class="form-control">
+            <input type="text" formControlName="descripcion" name="descripcion" id="descripcion" class="form-control">
           </div>
           
           <div class="mb-3">
             <label class="form-label">Tipo</label>
-            <select formControlName="tipo" class="form-select" required>
+            <select formControlName="tipo" class="form-select" name="tipo" id="tipo" required>
               <option value="" disabled>Seleccione</option>
               <option value="corriente">Corriente</option>
-              <option value="egreso">Diferido</option>
+              <option value="diferido">Diferido</option>
             </select>
           </div>
 
           <div class="mb-3">
             <label class="form-label">Meses</label>
-            <input type="number" min="1" formControlName="meses" class="form-control" required>
+            <input type="number" min="1" formControlName="meses" name="meses" id="meses" class="form-control" required>
           </div>
 
           <div class="mb-3">
             <label class="form-label">Vencimiento</label>
-            <input type="date" formControlName="fechaVencimiento" class="form-control" required>
+            <input type="date" formControlName="fechaVencimiento" name="fechaVencimiento" id="fechaVencimiento" class="form-control" required>
           </div>
 
         </div>
