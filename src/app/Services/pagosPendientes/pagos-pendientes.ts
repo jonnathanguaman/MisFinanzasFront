@@ -14,7 +14,15 @@ export class PagosPendientesService {
       return this.http.get(`${environment.urlhost + '/deuda/deudaUser'}/${username}`);
     }
 
-    createDeuda(data: any): Observable<any> {
-      return this.http.post(environment.urlhost + '/deuda', data);
+    createDeuda(data: PagosPendientesInterface): Observable<PagosPendientesInterface> {
+      return this.http.post<PagosPendientesInterface>(environment.urlhost + '/deuda', data);
+    }
+
+    actualizarDeuda(data: PagosPendientesInterface, id:number): Observable<PagosPendientesInterface> {
+      return this.http.put<PagosPendientesInterface>(`${environment.urlhost + '/deuda'}/${id}`,data);
+    }
+
+    eliminarDeuda(id:number): Observable<void> {
+      return this.http.delete<void>(`${environment.urlhost + '/deuda'}/${id}`);
     }
 }

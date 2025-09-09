@@ -1,0 +1,584 @@
+<div class="anotados-container">
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="bi bi-clipboard-data"></i>
+        Anotados
+      </h1>
+      <p class="page-subtitle">Gestiona tus clientes y registra sus compras</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="abrirModalCliente()">
+        <i class="bi bi-person-plus"></i>
+        Nuevo Cliente
+      </button>
+    </div>
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="search-bar">
+    <div class="search-input-container">
+      <i class="bi bi-search search-icon"></i>
+      <input 
+        type="text" 
+        class="search-input" 
+        placeholder="Buscar clientes, productos..."
+        [(ngModel)]="filtroTexto"
+        (input)="onFiltroChange()"
+      >
+    </div>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="cargando" class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando datos...</p>
+  </div>
+
+  <!-- Grid de clientes -->
+  <div *ngIf="!cargando" class="clients-grid">
+    <div *ngFor="let item of clienteFiltrado" class="client-card">
+      <!-- Header de la tarjeta -->
+      <div class="client-header">
+        <div class="client-info">
+          <h3 class="client-name">{{ item.cliente.nombre }}</h3>
+          <p class="client-description">{{ item.cliente.descripcion }}</p>
+        </div>
+        <div class="client-actions">
+          <button 
+            class="btn-icon btn-edit" 
+            (click)="abrirModalCliente(item.cliente)"
+            title="Editar cliente"
+          >
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button 
+            class="btn-icon btn-delete" 
+            (click)="eliminarCliente(item.cliente)"
+            title="Eliminar cliente"
+          >
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Estadísticas del cliente -->
+      <div class="client-stats">
+        <div class="stat">
+          <span class="stat-value">{{ item.totalNotas }}</span>
+          <span class="stat-label">Notas</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">${{ item.totalVentas.toFixed(2) }}</span>
+          <span class="stat-label">Total Ventas</span>
+        </div>
+      </div>
+
+      <!-- Botón para agregar nota -->
+      <div class="add-note-section">
+        <button 
+          class="btn btn-secondary btn-block" 
+          (click)="abrirModalNota(item.cliente)"
+        >
+          <i class="bi bi-plus-lg"></i>
+          Agregar Nota
+        </button>
+      </div>
+
+      <!-- Lista de notas -->
+      <div class="notes-section" *ngIf="item.notas.length > 0">
+        <h4 class="notes-title">Últimas Notas</h4>
+        <div class="notes-list">
+          <div *ngFor="let nota of item.notas.slice(0, 3)" class="note-item">
+            <div class="note-content">
+              <div class="note-header">
+                <span class="note-product">{{ nota.producto }}</span>
+                <span class="note-date">{{ nota.fecha | date:'dd/MM/yyyy' }}</span>
+              </div>
+              <div class="note-details">
+                <span class="note-quantity">Cant: {{ nota.cantidad }}</span>
+                <span class="note-price">Precio: ${{ nota.precio.toFixed(2) }}</span>
+                <span class="note-total">Total: ${{ nota.total.toFixed(2) }}</span>
+              </div>
+            </div>
+            <div class="note-actions">
+              <button 
+                class="btn-icon btn-edit-small" 
+                (click)="abrirModalNota(item.cliente, nota)"
+                title="Editar nota"
+              >
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button 
+                class="btn-icon btn-delete-small" 
+                (click)="eliminarNota(nota)"
+                title="Eliminar nota"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Mostrar más notas si hay -->
+        <div *ngIf="item.notas.length > 3" class="show-more">
+          <span class="show-more-text">y {{ item.notas.length - 3 }} nota(s) más...</span>
+        </div>
+      </div>
+
+      <!-- Estado sin notas -->
+      <div class="no-notes" *ngIf="item.notas.length === 0">
+        <i class="bi bi-journal-x"></i>
+        <p>No hay notas registradas</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estado sin clientes -->
+  <div *ngIf="!cargando && clienteFiltrado.length === 0" class="empty-state">
+    <i class="bi bi-people"></i>
+    <h3>No hay clientes registrados</h3>
+    <p>Comienza agregando tu primer cliente</p>
+    <button class="btn btn-primary" (click)="abrirModalCliente()">
+      <i class="bi bi-person-plus"></i>
+      Crear Cliente
+    </button>
+  </div>
+</div>
+
+<!-- Modal Cliente Bootstrap 5 -->
+<div class="modal fade" 
+     id="clienteModal" 
+     tabindex="-1" 
+     aria-labelledby="clienteModalLabel" 
+     aria-hidden="true"
+     [class.show]="showClienteModal"
+     [style.display]="showClienteModal ? 'block' : 'none'">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="clienteModalLabel">
+          {{ editandoCliente ? 'Editar Cliente' : 'Nuevo Cliente' }}
+        </h5>
+        <button type="button" 
+                class="btn-close" 
+                (click)="cerrarModalCliente()" 
+                aria-label="Close">
+        </button>
+      </div>
+      
+      <form [formGroup]="clienteForm" (ngSubmit)="guardarCliente()">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre *</label>
+            <input 
+              type="text" 
+              id="nombre"
+              class="form-control"
+              [class.is-invalid]="nombreControl?.invalid && nombreControl?.touched"
+              formControlName="nombre"
+              placeholder="Ingresa el nombre del cliente"
+            >
+            <div *ngIf="nombreControl?.invalid && nombreControl?.touched" class="invalid-feedback">
+              <span *ngIf="nombreControl?.errors?.['required']">El nombre es requerido</span>
+              <span *ngIf="nombreControl?.errors?.['minlength']">El nombre debe tener al menos 2 caracteres</span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción *</label>
+            <textarea 
+              id="descripcion"
+              class="form-control"
+              [class.is-invalid]="descripcionControl?.invalid && descripcionControl?.touched"
+              formControlName="descripcion"
+              rows="3"
+              placeholder="Describe al cliente, sus preferencias, etc."
+            ></textarea>
+            <div *ngIf="descripcionControl?.invalid && descripcionControl?.touched" class="invalid-feedback">
+              <span *ngIf="descripcionControl?.errors?.['required']">La descripción es requerida</span>
+              <span *ngIf="descripcionControl?.errors?.['minlength']">La descripción debe tener al menos 5 caracteres</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModalCliente()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="clienteForm.invalid">
+            {{ editandoCliente ? 'Actualizar' : 'Crear' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nota Bootstrap 5 -->
+<div class="modal fade" 
+     id="notaModal" 
+     tabindex="-1" 
+     aria-labelledby="notaModalLabel" 
+     aria-hidden="true"
+     [class.show]="showNotaModal"
+     [style.display]="showNotaModal ? 'block' : 'none'">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="notaModalLabel">
+          {{ editandoNota ? 'Editar Nota' : 'Nueva Nota' }}
+        </h5>
+        <button type="button" 
+                class="btn-close" 
+                (click)="cerrarModalNota()" 
+                aria-label="Close">
+        </button>
+      </div>
+      
+      <form [formGroup]="notaForm" (ngSubmit)="guardarNota()">
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="fecha" class="form-label">Fecha *</label>
+                <input 
+                  type="date" 
+                  id="fecha"
+                  class="form-control"
+                  [class.is-invalid]="fechaControl?.invalid && fechaControl?.touched"
+                  formControlName="fecha"
+                >
+                <div *ngIf="fechaControl?.invalid && fechaControl?.touched" class="invalid-feedback">
+                  <span *ngIf="fechaControl?.errors?.['required']">La fecha es requerida</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="clienteId" class="form-label">Cliente *</label>
+                <select 
+                  id="clienteId"
+                  class="form-select"
+                  [class.is-invalid]="clienteIdControl?.invalid && clienteIdControl?.touched"
+                  formControlName="clienteId"
+                >
+                  <option value="">Selecciona un cliente</option>
+                  <option *ngFor="let cliente of clientes" [value]="cliente.id">
+                    {{ cliente.nombre }}
+                  </option>
+                </select>
+                <div *ngIf="clienteIdControl?.invalid && clienteIdControl?.touched" class="invalid-feedback">
+                  <span *ngIf="clienteIdControl?.errors?.['required']">Debes seleccionar un cliente</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="producto" class="form-label">Producto *</label>
+            <input 
+              type="text" 
+              id="producto"
+              class="form-control"
+              [class.is-invalid]="productoControl?.invalid && productoControl?.touched"
+              formControlName="producto"
+              placeholder="Nombre del producto o servicio"
+            >
+            <div *ngIf="productoControl?.invalid && productoControl?.touched" class="invalid-feedback">
+              <span *ngIf="productoControl?.errors?.['required']">El producto es requerido</span>
+              <span *ngIf="productoControl?.errors?.['minlength']">El producto debe tener al menos 2 caracteres</span>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="cantidad" class="form-label">Cantidad *</label>
+                <input 
+                  type="number" 
+                  id="cantidad"
+                  class="form-control"
+                  [class.is-invalid]="cantidadControl?.invalid && cantidadControl?.touched"
+                  formControlName="cantidad"
+                  min="1"
+                  step="1"
+                  placeholder="0"
+                >
+                <div *ngIf="cantidadControl?.invalid && cantidadControl?.touched" class="invalid-feedback">
+                  <span *ngIf="cantidadControl?.errors?.['required']">La cantidad es requerida</span>
+                  <span *ngIf="cantidadControl?.errors?.['min']">La cantidad debe ser mayor a 0</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="precio" class="form-label">Precio Unitario *</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input 
+                    type="number" 
+                    id="precio"
+                    class="form-control"
+                    [class.is-invalid]="precioControl?.invalid && precioControl?.touched"
+                    formControlName="precio"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="0.00"
+                  >
+                </div>
+                <div *ngIf="precioControl?.invalid && precioControl?.touched" class="invalid-feedback">
+                  <span *ngIf="precioControl?.errors?.['required']">El precio es requerido</span>
+                  <span *ngIf="precioControl?.errors?.['min']">El precio debe ser mayor a 0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cálculo del total -->
+          <div class="alert alert-success d-flex justify-content-between align-items-center">
+            <strong>Total:</strong>
+            <span class="fs-4">${{ calcularTotal().toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModalNota()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="notaForm.invalid">
+            <i class="bi bi-check-lg me-2"></i>
+            {{ editandoNota ? 'Actualizar' : 'Crear' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop para modales -->
+<div class="modal-backdrop fade show" 
+     *ngIf="showClienteModal || showNotaModal"
+     (click)="showClienteModal ? cerrarModalCliente() : cerrarModalNota()">
+</div>
+
+<!-- Modal Cliente Bootstrap 5 -->
+<div class="modal fade" 
+     id="clienteModal" 
+     tabindex="-1" 
+     aria-labelledby="clienteModalLabel" 
+     aria-hidden="true"
+     [class.show]="showClienteModal"
+     [style.display]="showClienteModal ? 'block' : 'none'">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="clienteModalLabel">
+          {{ editandoCliente ? 'Editar Cliente' : 'Nuevo Cliente' }}
+        </h5>
+        <button type="button" 
+                class="btn-close" 
+                (click)="cerrarModalCliente()" 
+                aria-label="Close">
+        </button>
+      </div>
+      
+      <form [formGroup]="clienteForm" (ngSubmit)="guardarCliente()">
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre *</label>
+            <input 
+              type="text" 
+              id="nombre"
+              class="form-control"
+              [class.is-invalid]="nombreControl?.invalid && nombreControl?.touched"
+              formControlName="nombre"
+              placeholder="Ingresa el nombre del cliente"
+            >
+            <div *ngIf="nombreControl?.invalid && nombreControl?.touched" class="invalid-feedback">
+              <span *ngIf="nombreControl?.errors?.['required']">El nombre es requerido</span>
+              <span *ngIf="nombreControl?.errors?.['minlength']">El nombre debe tener al menos 2 caracteres</span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción *</label>
+            <textarea 
+              id="descripcion"
+              class="form-control"
+              [class.is-invalid]="descripcionControl?.invalid && descripcionControl?.touched"
+              formControlName="descripcion"
+              rows="3"
+              placeholder="Describe al cliente, sus preferencias, etc."
+            ></textarea>
+            <div *ngIf="descripcionControl?.invalid && descripcionControl?.touched" class="invalid-feedback">
+              <span *ngIf="descripcionControl?.errors?.['required']">La descripción es requerida</span>
+              <span *ngIf="descripcionControl?.errors?.['minlength']">La descripción debe tener al menos 5 caracteres</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModalCliente()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="clienteForm.invalid">
+            {{ editandoCliente ? 'Actualizar' : 'Crear' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nota Bootstrap 5 -->
+<div class="modal fade" 
+     id="notaModal" 
+     tabindex="-1" 
+     aria-labelledby="notaModalLabel" 
+     aria-hidden="true"
+     [class.show]="showNotaModal"
+     [style.display]="showNotaModal ? 'block' : 'none'">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="notaModalLabel">
+          {{ editandoNota ? 'Editar Nota' : 'Nueva Nota' }}
+        </h5>
+        <button type="button" 
+                class="btn-close" 
+                (click)="cerrarModalNota()" 
+                aria-label="Close">
+        </button>
+      </div>
+      
+      <form [formGroup]="notaForm" (ngSubmit)="guardarNota()">
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="fecha" class="form-label">Fecha *</label>
+                <input 
+                  type="date" 
+                  id="fecha"
+                  class="form-control"
+                  [class.is-invalid]="fechaControl?.invalid && fechaControl?.touched"
+                  formControlName="fecha"
+                >
+                <div *ngIf="fechaControl?.invalid && fechaControl?.touched" class="invalid-feedback">
+                  <span *ngIf="fechaControl?.errors?.['required']">La fecha es requerida</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="clienteId" class="form-label">Cliente *</label>
+                <select 
+                  id="clienteId"
+                  class="form-select"
+                  [class.is-invalid]="clienteIdControl?.invalid && clienteIdControl?.touched"
+                  formControlName="clienteId"
+                >
+                  <option value="">Selecciona un cliente</option>
+                  <option *ngFor="let cliente of clientes" [value]="cliente.id">
+                    {{ cliente.nombre }}
+                  </option>
+                </select>
+                <div *ngIf="clienteIdControl?.invalid && clienteIdControl?.touched" class="invalid-feedback">
+                  <span *ngIf="clienteIdControl?.errors?.['required']">Debes seleccionar un cliente</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="producto" class="form-label">Producto *</label>
+            <input 
+              type="text" 
+              id="producto"
+              class="form-control"
+              [class.is-invalid]="productoControl?.invalid && productoControl?.touched"
+              formControlName="producto"
+              placeholder="Nombre del producto o servicio"
+            >
+            <div *ngIf="productoControl?.invalid && productoControl?.touched" class="invalid-feedback">
+              <span *ngIf="productoControl?.errors?.['required']">El producto es requerido</span>
+              <span *ngIf="productoControl?.errors?.['minlength']">El producto debe tener al menos 2 caracteres</span>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="cantidad" class="form-label">Cantidad *</label>
+                <input 
+                  type="number" 
+                  id="cantidad"
+                  class="form-control"
+                  [class.is-invalid]="cantidadControl?.invalid && cantidadControl?.touched"
+                  formControlName="cantidad"
+                  min="1"
+                  step="1"
+                  placeholder="0"
+                >
+                <div *ngIf="cantidadControl?.invalid && cantidadControl?.touched" class="invalid-feedback">
+                  <span *ngIf="cantidadControl?.errors?.['required']">La cantidad es requerida</span>
+                  <span *ngIf="cantidadControl?.errors?.['min']">La cantidad debe ser mayor a 0</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="precio" class="form-label">Precio Unitario *</label>
+                <div class="input-group">
+                  <span class="input-group-text">$</span>
+                  <input 
+                    type="number" 
+                    id="precio"
+                    class="form-control"
+                    [class.is-invalid]="precioControl?.invalid && precioControl?.touched"
+                    formControlName="precio"
+                    min="0.01"
+                    step="0.01"
+                    placeholder="0.00"
+                  >
+                </div>
+                <div *ngIf="precioControl?.invalid && precioControl?.touched" class="invalid-feedback">
+                  <span *ngIf="precioControl?.errors?.['required']">El precio es requerido</span>
+                  <span *ngIf="precioControl?.errors?.['min']">El precio debe ser mayor a 0</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cálculo del total -->
+          <div class="alert alert-success d-flex justify-content-between align-items-center">
+            <strong>Total:</strong>
+            <span class="fs-4">${{ calcularTotal().toFixed(2) }}</span>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="cerrarModalNota()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="notaForm.invalid">
+            <i class="bi bi-check-lg me-2"></i>
+            {{ editandoNota ? 'Actualizar' : 'Crear' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop para modales -->
+<div class="modal-backdrop fade show" 
+     *ngIf="showClienteModal || showNotaModal"
+     (click)="showClienteModal ? cerrarModalCliente() : cerrarModalNota()">
+</div>

@@ -7,7 +7,7 @@ import { Categoria } from './Pages/platilla-user/categoria/categoria';
 import { Usuario } from './Pages/platilla-user/usuario/usuario';
 import { Transacciones } from './Pages/platilla-user/transacciones/transacciones';
 import { Dashboard } from './Pages/platilla-user/dashboard/dashboard';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { MenuAdmin } from './Shared/menu-admin/menu-admin';
 import { PlatillaUser } from './Pages/platilla-user/platilla-user';
@@ -16,6 +16,7 @@ import { MenuUser } from './Shared/menu-user/menu-user';
 import { Login } from './Pages/login/login';
 import { Register } from './Pages/register/register';
 import { PagosPendientes } from './Pages/platilla-user/pagos-pendientes/pagos-pendientes';
+import { Anotados } from './Pages/platilla-user/anotados/anotados';
 
 @NgModule({
   declarations: [
@@ -29,12 +30,14 @@ import { PagosPendientes } from './Pages/platilla-user/pagos-pendientes/pagos-pe
     PlatillaUser,
     Login,
     Register,
-    PagosPendientes
+    PagosPendientes,
+    Anotados
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
+    FormsModule,
   ],
   providers: [
     provideBrowserGlobalErrorListeners(),

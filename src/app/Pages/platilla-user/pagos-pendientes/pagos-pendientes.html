@@ -2,7 +2,7 @@
   <h4 class="mb-4 text-center">Deudas</h4>
 
   <div class="d-flex gap-3 mb-4">
-    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#transaccionModal" (click)="abrirModal()">
+    <button class="btn btn-primary" (click)="abrirModal()">
       ➕ Deuda
     </button>
 
@@ -15,13 +15,29 @@
     <div class="col-md-6 mb-3" *ngFor="let p of pagpsPendientes">
       <div class="card h-100 shadow-sm">
         <div class="card-header">
-          <h5 class="card-title">{{p.nombre}}</h5>
+          <h5 class="card-title"
+            [ngClass]="{
+            'text-success': p.estado === 'Pagado',
+            'text-warning': p.estado === 'Pendiente',
+            'text-danger': p.estado === 'Atrasado'
+          }"
+          >{{p.nombre}}</h5>
         </div>
         <div class="card-body">
           <p class="card-text"><strong>Monto: </strong>${{p.monto || 'Sin descripción'}}</p>
           <p class="card-text"><strong>Descripción: </strong>{{p.descripcion || 'Sin descripción'}}</p>
           <p class="card-text"><strong>Fecha venciminto: </strong>{{ p.fechaVencimiento | date:'dd/MM/yyyy' }}</p>
           <p class="card-text"><strong>Tipo: </strong>{{ p.tipo}}</p>
+          <div class="d-flex">
+            <p class="card-text"><strong>Estado: </strong></p> 
+            <p class="ms-1"
+            [ngClass]="{
+              'text-success': p.estado === 'Pagado',
+              'text-warning': p.estado === 'Pendiente',
+              'text-danger': p.estado === 'Atrasado'
+            }"
+            >{{ p.estado}}</p>
+          </div>
           <!-- Botón para desplegar -->
           <button class="btn p-0" type="button" data-bs-toggle="collapse" [attr.data-bs-target]="'#detalles'+ p.id"
             *ngIf="p.tipo === 'diferido'">
@@ -37,8 +53,9 @@
 
         </div>
         <div class="card-footer d-flex justify-content-center align-items-center gap-2">
+          <button class="btn btn-success btn-sm">✅ Pagado</button>
           <button class="btn btn-warning btn-sm" (click)="editarDeuda(p)">✏️ Editar</button>
-          <button class="btn btn-danger btn-sm">🗑️ Eliminar</button>
+          <button class="btn btn-danger btn-sm" (click)="eliminarDeuda(p.id)">🗑️ Eliminar</button>
         </div>
       </div>
     </div>
@@ -91,7 +108,7 @@
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-success" >💾 Guardar</button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="cerrarModal()">Cancelar</button>
         </div>
       </form>
     </div>
@@ -104,14 +121,10 @@
 
         <div class="modal-header">
           <h5 class="modal-title" id="calendarioModalLabel">Calendario</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
 
         <div class="modal-body">
-          <!-- Aquí puedes poner un calendario como FullCalendar o algo básico -->
-          <input type="date" class="form-control" />
-          <!-- O puedes integrar un componente más completo -->
-          <!-- <app-calendario></app-calendario> -->
+          <h2>Disponible proximamente </h2>
         </div>
 
         <div class="modal-footer">

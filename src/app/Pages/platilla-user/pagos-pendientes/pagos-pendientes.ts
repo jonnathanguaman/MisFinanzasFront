@@ -45,7 +45,10 @@ export class PagosPendientes implements OnInit {
     modal.show();
   }
 
-
+  cerrarModal() {
+    const modal = new bootstrap.Modal(this.modalEditar.nativeElement);
+    modal.hide();
+  }
 
   ngOnInit(): void {
     const token = sessionStorage.getItem('token');
@@ -74,27 +77,58 @@ export class PagosPendientes implements OnInit {
     if (token) {
       try {
         const payload: TokenPayload = jwtDecode(token);
-
         this.authservice.getIdUser(payload.sub).subscribe({
           next: (res) => {
             const idUsuario = res;
             this.pagosPendientesForm.patchValue({ idUsuario });
-            this.pagosPendientesService.createDeuda(this.pagosPendientesForm.value as unknown as PagosPendientesInterface ).subscribe({
-              next: (response) => {
-                console.log('Deuda creada exitosamente:', response);
-                this.pagosPendientesForm.reset();
-                alert("Deuda creada exitosamente");
-                this.ngOnInit();
-              },
-              error: (error) => {
-                console.error('Error al crear deuda:', error);
+            const idDeuda = this.pagosPendientesForm.value.id;
+            // Si hay un id, se actualiza la deuda
+            if (idDeuda) {
+              this.pagosPendientesService.actualizarDeuda(this.pagosPendientesForm.value as unknown as PagosPendientesInterface,idDeuda).subscribe({
+                next: (response) => {
+                  console.log('Deuda creada exitosamente:', response);
+                  this.pagosPendientesForm.reset();
+                  alert("Deuda creada exitosamente");
+                  this.ngOnInit();
+                },
+                error: (error) => {
+                  console.error('Error al crear deuda:', error);
+                }
+              });
+            }
+            else {
+                // Si no hay id, se crea una nueva deuda
+                this.pagosPendientesService.createDeuda(this.pagosPendientesForm.value as unknown as PagosPendientesInterface ).subscribe({
+                  next: (response) => {
+                    console.log('Deuda creada exitosamente:', response);
+                    this.pagosPendientesForm.reset();
+                    alert("Deuda creada exitosamente");
+                    this.ngOnInit();
+                  },
+                  error: (error) => {
+                    console.error('Error al crear deuda:', error);
+                  }
+                });
               }
-            });
-          }
+            }
         })
       } catch (error) {
         console.error('Error decoding token:', error);
       }
+    }
+  }
+
+  eliminarDeuda(id: number) {
+    if (confirm('¿Estás seguro de que quieres eliminar esta deuda?')) {
+      this.pagosPendientesService.eliminarDeuda(id).subscribe({
+        next: () => {
+          alert('Deuda eliminada exitosamente');
+          this.ngOnInit();
+        },
+        error: (error) => {
+          console.error('Error al eliminar deuda:', error);
+        }
+      });
     }
   }
 

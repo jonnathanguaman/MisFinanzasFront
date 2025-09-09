@@ -8,6 +8,7 @@ import { PlatillaUser } from './Pages/platilla-user/platilla-user';
 import { Login } from './Pages/login/login';
 import { Register } from './Pages/register/register';
 import { PagosPendientes } from './Pages/platilla-user/pagos-pendientes/pagos-pendientes';
+import { Anotados } from './Pages/platilla-user/anotados/anotados';
 const routes: Routes = [
 
   {
@@ -46,6 +47,10 @@ const routes: Routes = [
       {
         path: 'dashboard',
         component:Dashboard
+      },
+      {
+        path: 'anotados',
+        component:Anotados
       }
     ]
   }
